@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pulse Social | CodeAlpha Full Stack Platform</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Top banner -->
+  <div class="top-banner">
+    <div class="container-fluid top-banner-content">
+      <span><i class="fa-solid fa-graduation-cap"></i> <strong>CodeAlpha Internship Task 2</strong>: Full Stack Social Media Platform</span>
+      <span class="intern-badge">Intern: Redeemer Jerrey Kow Williams (CA/DF1/320453)</span>
+    </div>
+  </div>
+
+  <div class="app-layout">
+    <!-- Left Navigation Sidebar -->
+    <aside class="sidebar-left">
+      <div class="brand" onclick="socialApp.loadFeed()">
+        <i class="fa-solid fa-bolt-lightning brand-icon"></i>
+        <span>Pulse<strong>Social</strong></span>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="#" class="nav-link active" onclick="socialApp.loadFeed()"><i class="fa-solid fa-house"></i> Home Feed</a>
+        <a href="#" class="nav-link" onclick="socialApp.openMyProfile()"><i class="fa-regular fa-user"></i> My Profile</a>
+        <a href="#" class="nav-link" onclick="socialApp.focusComposer()"><i class="fa-regular fa-pen-to-square"></i> New Post</a>
+      </nav>
+
+      <div class="auth-box" id="authBox">
+        <!-- Rendered via JS -->
+      </div>
+    </aside>
+
+    <!-- Center Timeline Feed -->
+    <main class="timeline-main">
+      <header class="timeline-header">
+        <h2 id="timelineTitle">Home Feed</h2>
+        <button class="btn-refresh" onclick="socialApp.loadFeed()"><i class="fa-solid fa-rotate-right"></i></button>
+      </header>
+
+      <!-- Post Composer -->
+      <section class="composer-card" id="composerCard">
+        <div class="composer-top">
+          <img id="composerAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80" alt="Avatar" class="avatar-sm">
+          <textarea id="postContent" placeholder="What's happening in tech today? Share an update, insight, or achievement..." rows="3"></textarea>
+        </div>
+        <div class="composer-image-preview" id="imagePreviewContainer" style="display: none;">
+          <img id="imagePreview" src="" alt="Preview">
+          <button class="btn-remove-preview" onclick="socialApp.clearImagePreview()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="composer-bottom">
+          <div class="composer-tools">
+            <button type="button" class="tool-btn" onclick="socialApp.promptImageModal()"><i class="fa-regular fa-image"></i> Attach Image</button>
+          </div>
+          <button class="btn btn-primary" id="btnPublish" onclick="socialApp.createPost()">
+            <i class="fa-regular fa-paper-plane"></i> Post
+          </button>
+        </div>
+      </section>
+
+      <!-- Feed Container -->
+      <div class="posts-stream" id="postsStream">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading community posts...</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right Sidebar (Profile widget & Who to follow) -->
+    <aside class="sidebar-right">
+      <div class="widget profile-card" id="myProfileWidget">
+        <!-- Injected via JS -->
+      </div>
+
+      <div class="widget suggested-widget">
+        <h3>Suggested Developers</h3>
+        <div id="suggestedUsersList" class="suggested-list">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <div class="footer-note">
+        <p><strong>CodeAlpha Full Stack Project</strong></p>
+        <p>REST API • Authentication • SQLite/JSON Store</p>
+        <p>© 2026 Redeemer Jerrey Kow Williams</p>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Comments Modal -->
+  <div class="modal" id="commentsModal">
+    <div class="modal-backdrop" onclick="socialApp.closeCommentsModal()"></div>
+    <div class="modal-content modal-comments">
+      <button class="modal-close" onclick="socialApp.closeCommentsModal()"><i class="fa-solid fa-xmark"></i></button>
+      <div id="modalPostPreview" class="modal-post-preview"></div>
+      
+      <div class="comments-section">
+        <h4>Discussion (<span id="modalCommentsCount">0</span>)</h4>
+        <div class="comments-list" id="modalCommentsList"></div>
+      </div>
+
+      <form onsubmit="socialApp.submitComment(event)" class="comment-compose">
+        <input type="text" id="commentInput" placeholder="Add a thoughtful reply..." required>
+        <button type="submit" class="btn btn-primary btn-sm"><i class="fa-regular fa-comment"></i> Reply</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Auth Modal -->
+  <div class="modal" id="authModal">
+    <div class="modal-backdrop" onclick="socialApp.closeAuthModal()"></div>
+    <div class="modal-content modal-auth">
+      <button class="modal-close" onclick="socialApp.closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+      <div class="auth-tabs">
+        <button id="tabLogin" class="tab-btn active" onclick="socialApp.switchAuthTab('login')">Sign In</button>
+        <button id="tabRegister" class="tab-btn" onclick="socialApp.switchAuthTab('register')">Join Community</button>
+      </div>
+
+      <form id="formLogin" onsubmit="socialApp.handleLogin(event)" class="auth-form">
+        <div class="input-group">
+          <label>Email or Username</label>
+          <input type="text" id="loginId" required placeholder="redeemer_williams or user@mail.com">
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="loginPass" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+      </form>
+
+      <form id="formRegister" onsubmit="socialApp.handleRegister(event)" class="auth-form" style="display: none;">
+        <div class="input-group">
+          <label>Full Name</label>
+          <input type="text" id="regName" required placeholder="Alex Rivera">
+        </div>
+        <div class="input-group">
+          <label>Username</label>
+          <input type="text" id="regUsername" required placeholder="alex_codes">
+        </div>
+        <div class="input-group">
+          <label>Email Address</label>
+          <input type="email" id="regEmail" required placeholder="alex@tech.io">
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="regPass" minlength="6" required placeholder="At least 6 characters">
+        </div>
+        <div class="input-group">
+          <label>Bio (Optional)</label>
+          <input type="text" id="regBio" placeholder="Software Engineer passionate about Web3 & Cloud">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Attach Image Modal -->
+  <div class="modal" id="imageModal">
+    <div class="modal-backdrop" onclick="socialApp.closeImageModal()"></div>
+    <div class="modal-content modal-sm">
+      <button class="modal-close" onclick="socialApp.closeImageModal()"><i class="fa-solid fa-xmark"></i></button>
+      <h3>Attach Media Image</h3>
+      <p style="color: #64748b; font-size: 0.88rem; margin-bottom: 16px;">Paste an image link from Unsplash, Imgur, or the web:</p>
+      <input type="url" id="imageUrlInput" placeholder="https://images.unsplash.com/..." style="width: 100%; padding: 10px; margin-bottom: 16px; border: 1px solid #cbd5e1; border-radius: 6px;">
+      <button type="button" class="btn btn-primary btn-block" onclick="socialApp.attachImageUrl()">Apply Image</button>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastBox"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
